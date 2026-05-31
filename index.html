@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>New Homes Australia — Discover, Compare & Secure Australia's Best New Home Opportunities</title>
+<meta name="description" content="Australia's operating system for purchasing a new home. Exclusive estates, matched to your profile, guided by expert consultants.">
+<meta property="og:title" content="New Homes Australia">
+<meta property="og:description" content="Discover, compare and secure Australia's best new home opportunities.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07080D;
+  --bg-card:#0D1117;
+  --bg-card2:#111827;
+  --bg-glass:rgba(255,255,255,0.04);
+  --border:rgba(255,255,255,0.08);
+  --border-light:rgba(255,255,255,0.12);
+  --accent:#2563EB;
+  --accent-light:#3B82F6;
+  --gold:#F59E0B;
+  --gold-light:#FCD34D;
+  --success:#10B981;
+  --text:#F1F5F9;
+  --text-muted:#94A3B8;
+  --text-dim:#475569;
+  --radius:12px;
+  --radius-lg:18px;
+  --radius-xl:24px;
+  --shadow:0 1px 3px rgba(0,0,0,0.4),0 1px 2px rgba(0,0,0,0.3);
+  --shadow-lg:0 10px 40px rgba(0,0,0,0.6);
+  --shadow-glow:0 0 0 1px rgba(37,99,235,0.3),0 4px 24px rgba(37,99,235,0.15);
+  --transition:all 0.2s cubic-bezier(0.4,0,0.2,1);
+}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+
+/* ─ SCROLLBAR ─ */
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg-card)}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15);border-radius:3px}
+
+/* ─ TYPOGRAPHY ─ */
+.label{font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim)}
+.label-accent{color:var(--accent-light)}
+.label-gold{color:var(--gold)}
+.display-1{font-size:clamp(40px,6vw,80px);font-weight:800;letter-spacing:-2px;line-height:1.05}
+.display-2{font-size:clamp(28px,4vw,52px);font-weight:800;letter-spacing:-1.5px;line-height:1.1}
+.heading{font-size:clamp(22px,3vw,36px);font-weight:700;letter-spacing:-0.5px;line-height:1.2}
+.body-lg{font-size:16px;line-height:1.75;color:var(--text-muted)}
+.body-sm{font-size:13px;line-height:1.65;color:var(--text-muted)}
+
+/* ─ LAYOUT ─ */
+.container{max-width:1280px;margin:0 auto;padding:0 32px}
+.section{padding:96px 0}
+.section-sm{padding:64px 0}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.flex{display:flex}
+.items-center{align-items:center}
+.gap-2{gap:8px}.gap-3{gap:12px}.gap-4{gap:16px}.gap-6{gap:24px}
+
+/* ─ BUTTONS ─ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:'Inter',sans-serif;font-weight:600;border:none;cursor:pointer;border-radius:10px;transition:var(--transition);white-space:nowrap;text-decoration:none}
+.btn-primary{background:var(--accent);color:#fff;padding:14px 28px;font-size:15px;box-shadow:0 4px 20px rgba(37,99,235,0.4)}
+.btn-primary:hover{background:var(--accent-light);transform:translateY(-1px);box-shadow:0 8px 30px rgba(37,99,235,0.5)}
+.btn-secondary{background:rgba(255,255,255,0.06);color:var(--text);border:1px solid var(--border-light);padding:14px 28px;font-size:15px}
+.btn-secondary:hover{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2)}
+.btn-gold{background:var(--gold);color:#0A0F1A;padding:14px 28px;font-size:15px;font-weight:700}
+.btn-gold:hover{background:var(--gold-light);transform:translateY(-1px)}
+.btn-sm{padding:9px 18px;font-size:13px;border-radius:8px}
+.btn-icon{width:40px;height:40px;padding:0;border-radius:8px}
+
+/* ─ CARDS ─ */
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:var(--transition)}
+.card:hover{border-color:var(--border-light);transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.card-glass{background:var(--bg-glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:var(--radius-lg)}
+.card-body{padding:24px}
+
+/* ─ BADGES ─ */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:0.3px}
+.badge-blue{background:rgba(37,99,235,0.15);color:#60A5FA;border:1px solid rgba(37,99,235,0.25)}
+.badge-green{background:rgba(16,185,129,0.15);color:#34D399;border:1px solid rgba(16,185,129,0.25)}
+.badge-gold{background:rgba(245,158,11,0.15);color:#FCD34D;border:1px solid rgba(245,158,11,0.25)}
+.badge-red{background:rgba(239,68,68,0.15);color:#F87171;border:1px solid rgba(239,68,68,0.25)}
+.badge-dim{background:rgba(255,255,255,0.06);color:var(--text-muted);border:1px solid var(--border)}
+
+/* ─ SCORE PILL ─ */
+.score-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700}
+.score-high{background:rgba(16,185,129,0.15);color:#34D399;border:1px solid rgba(16,185,129,0.3)}
+.score-med{background:rgba(37,99,235,0.15);color:#60A5FA;border:1px solid rgba(37,99,235,0.3)}
+
+/* ─ NAV ─ */
+#nav{position:fixed;top:0;left:0;right:0;z-index:1000;height:64px;display:flex;align-items:center;background:rgba(7,8,13,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:1280px;margin:0 auto;padding:0 32px}
+.nav-brand{display:flex;flex-direction:column;gap:0;text-decoration:none}
+.nav-brand-main{font-size:17px;font-weight:800;letter-spacing:-0.5px;color:#fff}
+.nav-brand-sub{font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim)}
+.nav-links{display:flex;align-items:center;gap:4px}
+.nav-link{font-size:14px;font-weight:500;color:var(--text-muted);text-decoration:none;padding:8px 14px;border-radius:8px;transition:var(--transition)}
+.nav-link:hover{color:var(--text);background:rgba(255,255,255,0.06)}
+.nav-cta-area{display:flex;align-items:center;gap:10px}
+.nav-hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px}
+.nav-hamburger span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px;transition:var(--transition)}
+
+/* ─ HERO ─ */
+#hero{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;padding-top:64px}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(37,99,235,0.15) 0%,transparent 60%),radial-gradient(ellipse 40% 40% at 90% 80%,rgba(245,158,11,0.06) 0%,transparent 60%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.015) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black,transparent)}
+.hero-content{position:relative;text-align:center;max-width:900px;margin:0 auto;padding:80px 32px}
+.hero-label{display:inline-flex;align-items:center;gap:8px;background:rgba(37,99,235,0.1);border:1px solid rgba(37,99,235,0.25);border-radius:20px;padding:6px 16px;margin-bottom:28px}
+.hero-label-dot{width:6px;height:6px;background:var(--success);border-radius:50%;animation:pulse-dot 2s infinite}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.5)}}
+.hero-eyebrow{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--accent-light)}
+.hero-sub{font-size:clamp(16px,2vw,20px);color:var(--text-muted);max-width:620px;margin:20px auto 40px;line-height:1.7}
+.hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:64px}
+.hero-stats{display:flex;gap:0;justify-content:center;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-card);overflow:hidden;max-width:600px;margin:0 auto}
+.hero-stat{flex:1;padding:20px 16px;text-align:center;border-right:1px solid var(--border)}
+.hero-stat:last-child{border-right:none}
+.hero-stat-num{font-size:24px;font-weight:800;color:#fff;letter-spacing:-1px}
+.hero-stat-label{font-size:10px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--text-dim);margin-top:3px}
+
+/* ─ BUYER PROFILE ENGINE ─ */
+#profileModal{position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px)}
+.profile-panel{background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-xl);padding:40px;max-width:600px;width:100%;position:relative;box-shadow:var(--shadow-lg)}
+.profile-progress{display:flex;gap:6px;margin-bottom:32px}
+.profile-dot{flex:1;height:3px;background:var(--border);border-radius:2px;transition:var(--transition)}
+.profile-dot.done{background:var(--accent)}
+.profile-dot.active{background:var(--accent-light);box-shadow:0 0 8px rgba(59,130,246,0.5)}
+.profile-question{font-size:24px;font-weight:700;color:#fff;margin-bottom:8px;letter-spacing:-0.5px}
+.profile-sub{font-size:14px;color:var(--text-muted);margin-bottom:28px}
+.profile-options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.profile-option{background:var(--bg-card2);border:1.5px solid var(--border);border-radius:var(--radius);padding:16px 18px;cursor:pointer;transition:var(--transition);text-align:left}
+.profile-option:hover{border-color:var(--accent-light);background:rgba(37,99,235,0.06)}
+.profile-option.selected{border-color:var(--accent);background:rgba(37,99,235,0.1)}
+.profile-option-icon{font-size:22px;margin-bottom:8px}
+.profile-option-label{font-size:14px;font-weight:600;color:#fff;margin-bottom:2px}
+.profile-option-desc{font-size:11px;color:var(--text-muted)}
+.profile-nav{display:flex;justify-content:space-between;align-items:center;margin-top:28px}
+.profile-skip{font-size:13px;color:var(--text-dim);cursor:pointer;text-decoration:underline}
+.profile-skip:hover{color:var(--text-muted)}
+
+/* ─ TRUST BAR ─ */
+#trust-bar{background:rgba(255,255,255,0.02);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.trust-inner{display:flex;justify-content:center;gap:0;padding:20px 0}
+.trust-item{flex:1;max-width:240px;display:flex;flex-direction:column;align-items:center;padding:0 24px;border-right:1px solid var(--border)}
+.trust-item:last-child{border-right:none}
+.trust-num{font-size:26px;font-weight:800;color:#fff;letter-spacing:-1px}
+.trust-label{font-size:10px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--text-dim);margin-top:2px}
+
+/* ─ ESTATE CARDS ─ */
+.estate-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-xl);overflow:hidden;transition:var(--transition);cursor:pointer}
+.estate-card:hover{border-color:rgba(37,99,235,0.3);transform:translateY(-3px);box-shadow:0 20px 60px rgba(0,0,0,0.5),0 0 0 1px rgba(37,99,235,0.1)}
+.estate-card-img{position:relative;height:220px;overflow:hidden;background:var(--bg-card2)}
+.estate-card-img img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s ease}
+.estate-card:hover .estate-card-img img{transform:scale(1.04)}
+.estate-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(7,8,13,0.85) 0%,transparent 50%)}
+.estate-card-badges{position:absolute;top:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap}
+.estate-card-body{padding:20px}
+.estate-card-region{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px}
+.estate-card-name{font-size:18px;font-weight:700;color:#fff;letter-spacing:-0.3px;margin-bottom:4px}
+.estate-card-suburb{font-size:13px;color:var(--text-muted);margin-bottom:14px}
+.estate-card-price{font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.5px;margin-bottom:4px}
+.estate-card-price-label{font-size:11px;color:var(--text-dim)}
+.estate-card-divider{border:none;border-top:1px solid var(--border);margin:14px 0}
+.estate-card-meta{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-muted)}
+.estate-card-scores{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+
+/* ─ MATCH SCORE ─ */
+.match-ring{position:relative;display:inline-flex;align-items:center;justify-content:center}
+.match-ring-num{font-size:11px;font-weight:800;color:#fff}
+
+/* ─ PACKAGE BUILDER (sticky panel) ─ */
+#packagePanel{position:fixed;bottom:0;left:0;right:0;z-index:900;background:rgba(13,17,23,0.98);border-top:1px solid var(--border-light);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);transform:translateY(100%);transition:transform 0.35s cubic-bezier(0.4,0,0.2,1)}
+#packagePanel.visible{transform:translateY(0)}
+.pkg-inner{display:flex;align-items:center;gap:24px;padding:16px 32px;max-width:1280px;margin:0 auto;overflow-x:auto}
+.pkg-item{display:flex;flex-direction:column;align-items:center;flex-shrink:0;min-width:80px}
+.pkg-label{font-size:9px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--text-dim);margin-bottom:3px}
+.pkg-value{font-size:15px;font-weight:700;color:#fff;white-space:nowrap}
+.pkg-divider{width:1px;height:36px;background:var(--border);flex-shrink:0}
+.pkg-cta{flex-shrink:0;margin-left:auto}
+.pkg-toggle{position:fixed;bottom:20px;right:20px;z-index:901;width:52px;height:52px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 20px rgba(37,99,235,0.5);transition:var(--transition)}
+.pkg-toggle:hover{background:var(--accent-light);transform:scale(1.08)}
+
+/* ─ PROFILE INTELLIGENCE ─ */
+.intel-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px}
+.intel-value{font-size:28px;font-weight:800;color:#fff;letter-spacing:-1px;margin-bottom:2px}
+.intel-label{font-size:11px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;color:var(--text-dim)}
+.intel-trend{font-size:12px;font-weight:600;margin-top:4px}
+.intel-positive{color:var(--success)}
+.intel-negative{color:#F87171}
+
+/* ─ HOW IT WORKS ─ */
+.step-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;position:relative;overflow:hidden}
+.step-num{font-size:80px;font-weight:900;color:rgba(255,255,255,0.04);position:absolute;top:-10px;right:16px;line-height:1;letter-spacing:-4px;user-select:none}
+.step-icon{font-size:28px;margin-bottom:14px}
+.step-title{font-size:16px;font-weight:700;color:#fff;margin-bottom:8px;letter-spacing:-0.2px}
+.step-desc{font-size:13px;color:var(--text-muted);line-height:1.65}
+
+/* ─ CONSULTANT CARDS ─ */
+.consultant-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;display:flex;align-items:center;gap:18px;transition:var(--transition)}
+.consultant-card:hover{border-color:var(--border-light)}
+.consultant-avatar{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-light));display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#fff;flex-shrink:0}
+.consultant-name{font-size:15px;font-weight:700;color:#fff;margin-bottom:2px}
+.consultant-role{font-size:12px;color:var(--text-muted);margin-bottom:8px}
+
+/* ─ BUILDER PARTNER CARDS ─ */
+.partner-card{background:var(--bg-card2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 24px;display:flex;align-items:center;gap:16px;transition:var(--transition)}
+.partner-card:hover{border-color:var(--border-light);background:rgba(255,255,255,0.04)}
+.partner-logo-wrap{width:80px;height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.partner-logo-wrap img{max-width:80px;max-height:36px;object-fit:contain;filter:brightness(0) invert(1);opacity:0.7;transition:var(--transition)}
+.partner-card:hover .partner-logo-wrap img{opacity:1}
+
+/* ─ SECTION HEADER ─ */
+.section-header{text-align:center;max-width:680px;margin:0 auto 52px}
+.section-label{display:inline-block;margin-bottom:14px;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--accent-light)}
+.section-title{font-size:clamp(26px,4vw,42px);font-weight:800;color:#fff;letter-spacing:-1px;line-height:1.15;margin-bottom:16px}
+.section-desc{font-size:16px;color:var(--text-muted);line-height:1.7}
+
+/* ─ FILTERS (estates) ─ */
+.filter-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:32px;padding:16px 20px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg)}
+.filter-select{background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 32px 8px 12px;font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394A3B8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;min-width:140px}
+.filter-select:focus{outline:none;border-color:var(--accent)}
+.filter-search{background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 14px;font-family:'Inter',sans-serif;font-size:13px;flex:1;min-width:180px}
+.filter-search:focus{outline:none;border-color:var(--accent)}
+.filter-search::placeholder{color:var(--text-dim)}
+
+/* ─ EMPTY STATE ─ */
+.empty-state{text-align:center;padding:60px 24px;color:var(--text-muted)}
+.empty-state-icon{font-size:40px;margin-bottom:14px}
+
+/* ─ FOOTER ─ */
+footer{background:var(--bg-card);border-top:1px solid var(--border);padding:48px 0 32px}
+.footer-inner{max-width:1280px;margin:0 auto;padding:0 32px}
+.footer-brand{font-size:18px;font-weight:800;color:#fff;letter-spacing:-0.5px;margin-bottom:4px}
+.footer-tagline{font-size:12px;color:var(--text-dim)}
+.footer-links{display:flex;gap:24px;font-size:13px;color:var(--text-dim)}
+.footer-links a{color:var(--text-dim);text-decoration:none;transition:color 0.15s}
+.footer-links a:hover{color:var(--text-muted)}
+.footer-bottom{border-top:1px solid var(--border);margin-top:32px;padding-top:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:gap;gap:12px;font-size:12px;color:var(--text-dim)}
+.footer-disclaimer{max-width:600px}
+
+/* ─ CHAT WIDGET ─ */
+#chatWidget{position:fixed;bottom:24px;right:24px;z-index:9000}
+#chatToggle{width:52px;height:52px;border-radius:50%;background:var(--accent);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 20px rgba(37,99,235,0.4);transition:var(--transition);position:relative}
+#chatToggle:hover{background:var(--accent-light);transform:scale(1.08)}
+.chat-badge-dot{position:absolute;top:-2px;right:-2px;width:14px;height:14px;background:#ef4444;border-radius:50%;border:2px solid var(--bg);font-size:8px;font-weight:800;display:flex;align-items:center;justify-content:center;color:#fff}
+#chatPanel{display:none;position:absolute;bottom:66px;right:0;width:300px;background:var(--bg-card);border:1px solid var(--border-light);border-radius:18px;box-shadow:var(--shadow-lg);overflow:hidden;font-family:'Inter',sans-serif}
+.chat-head{background:var(--accent);padding:16px 18px;color:#fff}
+.chat-head-title{font-weight:700;font-size:14px;margin-bottom:2px}
+.chat-head-sub{font-size:11px;opacity:0.8;display:flex;align-items:center;gap:5px}
+.chat-dot{width:6px;height:6px;background:var(--success);border-radius:50%}
+.chat-messages{padding:14px;max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+.chat-bubble{background:var(--bg-card2);border-radius:12px 12px 12px 0;padding:10px 12px;font-size:12px;color:var(--text-muted);line-height:1.6;max-width:88%}
+.chat-form{padding:12px 14px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:7px}
+.chat-input{background:var(--bg-card2);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:8px 11px;font-family:'Inter',sans-serif;font-size:12px;outline:none}
+.chat-input:focus{border-color:var(--accent)}
+.chat-input::placeholder{color:var(--text-dim)}
+.chat-submit{background:var(--accent);color:#fff;border:none;border-radius:7px;padding:9px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
+.chat-submit:hover{background:var(--accent-light)}
+
+/* ─ FADE IN ─ */
+.fade-up{opacity:0;transform:translateY(24px);transition:opacity 0.5s ease,transform 0.5s ease}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+
+/* ─ RESPONSIVE ─ */
+@media(max-width:1024px){.grid-4{grid-template-columns:repeat(2,1fr)}.grid-3{grid-template-columns:repeat(2,1fr)}.pkg-cta{display:none}}
+@media(max-width:768px){.grid-2,.grid-3{grid-template-columns:1fr}.container{padding:0 20px}.section{padding:64px 0}.nav-links{display:none}.nav-hamburger{display:flex}.hero-stats{flex-wrap:wrap}.trust-inner{flex-wrap:wrap;justify-content:flex-start}.trust-item{min-width:120px;border-right:none;border-bottom:1px solid var(--border);padding:14px 20px}.trust-item:last-child{border-bottom:none}.profile-options{grid-template-columns:1fr}}
+@media(max-width:480px){.hero-btns{flex-direction:column}.display-1{font-size:36px}.pkg-inner{padding:12px 20px;gap:16px}}
+</style>
+</head>
+<body>
+
+<!-- ─── NAVIGATION ─── -->
+<nav id="nav">
+ <div class="nav-inner">
+  <a href="#" class="nav-brand">
+   <span class="nav-brand-main">New Homes Australia</span>
+   <span class="nav-brand-sub">Powered by ProjX</span>
+  </a>
+  <div class="nav-links">
+   <a href="#estates" class="nav-link">Estates</a>
+   <a href="#how-it-works" class="nav-link">How It Works</a>
+   <a href="#intelligence" class="nav-link">Intelligence</a>
+   <a href="#consultants" class="nav-link">Consultants</a>
+   <a href="#developer-access" class="nav-link" style="color:var(--text-dim);font-size:12px">Developer Access</a>
+  </div>
+  <div class="nav-cta-area">
+   <button class="btn btn-secondary btn-sm" onclick="openProfile()">My Profile</button>
+   <button class="btn btn-primary btn-sm" onclick="openProfile()">Start Journey</button>
+  </div>
+  <button class="nav-hamburger" aria-label="Menu" onclick="toggleNav()" id="hamburger"><span></span><span></span><span></span></button>
+ </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section id="hero">
+ <div class="hero-bg"></div>
+ <div class="hero-grid"></div>
+ <div class="hero-content">
+  <div class="hero-label">
+   <span class="hero-label-dot"></span>
+   <span class="hero-eyebrow">Australia's New Homes Platform</span>
+  </div>
+  <h1 class="display-1">Discover, Compare &<br>Secure Your New Home.</h1>
+  <p class="hero-sub">The intelligent platform that guides buyers from discovery through to purchase — matching the right estate, lot, builder and package to your exact profile.</p>
+  <div class="hero-btns">
+   <button class="btn btn-primary" style="font-size:16px;padding:16px 36px" onclick="openProfile()">
+    Start Your Property Journey →
+   </button>
+   <a href="#estates" class="btn btn-secondary" style="font-size:16px;padding:16px 36px">
+    Explore Estates
+   </a>
+  </div>
+  <div class="hero-stats">
+   <div class="hero-stat"><div class="hero-stat-num" id="hStatProjects">18</div><div class="hero-stat-label">Active Estates</div></div>
+   <div class="hero-stat"><div class="hero-stat-num" id="hStatLots">4,500+</div><div class="hero-stat-label">Lots Available</div></div>
+   <div class="hero-stat"><div class="hero-stat-num">12</div><div class="hero-stat-label">Builder Partners</div></div>
+   <div class="hero-stat"><div class="hero-stat-num">$0</div><div class="hero-stat-label">Buyer Fees</div></div>
+  </div>
+ </div>
+</section>
+
+<!-- ─── TRUST BAR ─── -->
+<div id="trust-bar">
+ <div class="trust-inner container">
+  <div class="trust-item"><div class="trust-num">SEQ #1</div><div class="trust-label">Project Marketer</div></div>
+  <div class="trust-item"><div class="trust-num">Exclusive</div><div class="trust-label">Estate Access</div></div>
+  <div class="trust-item"><div class="trust-num">Wholesale</div><div class="trust-label">Builder Pricing</div></div>
+  <div class="trust-item"><div class="trust-num">Expert</div><div class="trust-label">Consultants</div></div>
+ </div>
+</div>
+
+<!-- ─── HOW IT WORKS ─── -->
+<section id="how-it-works" class="section">
+ <div class="container">
+  <div class="section-header fade-up">
+   <span class="section-label">The Journey</span>
+   <h2 class="section-title">From discovery to keys — guided every step.</h2>
+   <p class="section-desc">New Homes Australia simplifies complex decisions. We match you with the right opportunity and guide you through every stage.</p>
+  </div>
+  <div class="grid-4 fade-up" id="stepsGrid"></div>
+ </div>
+</section>
+
+<!-- ─── ESTATES ─── -->
+<section id="estates" class="section" style="background:rgba(255,255,255,0.01);border-top:1px solid var(--border)">
+ <div class="container">
+  <div class="section-header fade-up">
+   <span class="section-label">Active Opportunities</span>
+   <h2 class="section-title">Exclusive Estates & Projects</h2>
+   <p class="section-desc">New Homes Australia provides exclusive access to active estates across South East Queensland. Browse opportunities matched to your profile.</p>
+  </div>
+  <!-- Filter Bar -->
+  <div class="filter-bar fade-up">
+   <input type="text" class="filter-search" id="estateSearch" placeholder="🔍  Search suburb, estate or region..." oninput="filterEstates()">
+   <select class="filter-select" id="regionFilter" onchange="filterEstates()"><option value="">All Regions</option></select>
+   <select class="filter-select" id="timingFilter" onchange="filterEstates()">
+    <option value="">Any Timing</option>
+    <option value="0">🟢 Title Ready</option>
+    <option value="3">Within 3 Months</option>
+    <option value="6">Within 6 Months</option>
+    <option value="12">Within 12 Months</option>
+   </select>
+   <select class="filter-select" id="budgetFilter" onchange="filterEstates()">
+    <option value="">Any Budget</option>
+    <option value="500">Under $500k</option>
+    <option value="700">$500k – $700k</option>
+    <option value="900">$700k – $900k</option>
+    <option value="901">$900k+</option>
+   </select>
+   <span id="estateCount" style="font-size:12px;color:var(--text-dim);white-space:nowrap;margin-left:auto"></span>
+  </div>
+  <div class="grid-3" id="estatesGrid"></div>
+ </div>
+</section>
+
+<!-- ─── PROPERTY INTELLIGENCE ─── -->
+<section id="intelligence" class="section">
+ <div class="container">
+  <div class="section-header fade-up">
+   <span class="section-label">Property Intelligence</span>
+   <h2 class="section-title">Every package. Every cost. Live.</h2>
+   <p class="section-desc">We give you the complete financial picture — land, build, site costs, weekly repayments and yield — before you speak to a consultant.</p>
+  </div>
+  <div class="grid-2 fade-up">
+   <div>
+    <div class="grid-2" id="intelGrid" style="margin-bottom:24px"></div>
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px">
+     <div class="label label-accent" style="margin-bottom:14px">Sample Package Intelligence — Oakland Estate</div>
+     <div style="display:flex;flex-direction:column;gap:10px" id="pkgBreakdown"></div>
+    </div>
+   </div>
+   <div style="background:linear-gradient(135deg,rgba(37,99,235,0.08),rgba(245,158,11,0.04));border:1px solid var(--border);border-radius:var(--radius-xl);padding:32px;display:flex;flex-direction:column;justify-content:space-between">
+    <div>
+     <div class="badge badge-gold" style="margin-bottom:16px">⭐ Featured Package</div>
+     <div style="font-size:28px;font-weight:900;color:#fff;letter-spacing:-1px;margin-bottom:4px">Oakland Estate — Lot 14</div>
+     <div style="font-size:14px;color:var(--text-muted);margin-bottom:24px">Beaudesert · Scenic Rim · 450m²</div>
+     <div id="featuredScores" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px"></div>
+    </div>
+    <div>
+     <div style="font-size:40px;font-weight:900;color:#fff;letter-spacing:-2px;margin-bottom:4px">$689,500</div>
+     <div style="font-size:13px;color:var(--text-muted);margin-bottom:20px">Total package · Land $425k + Build $264.5k</div>
+     <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm" onclick="openProfile()">Build My Package →</button>
+      <button class="btn btn-secondary btn-sm" onclick="document.getElementById('estates').scrollIntoView({behavior:'smooth'})">Browse Estates</button>
+     </div>
+    </div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- ─── CONSULTANTS ─── -->
+<section id="consultants" class="section" style="background:rgba(255,255,255,0.01);border-top:1px solid var(--border)">
+ <div class="container">
+  <div class="section-header fade-up">
+   <span class="section-label">Expert Guidance</span>
+   <h2 class="section-title">Property Consultants. Not salespeople.</h2>
+   <p class="section-desc">Our New Homes Australia Property Consultants are matched to your profile before you speak. They already know your budget, location preference and shortlisted properties.</p>
+  </div>
+  <div class="grid-3 fade-up" id="consultantsGrid"></div>
+  <div style="text-align:center;margin-top:40px">
+   <button class="btn btn-primary" onclick="openProfile()">Book a Strategy Session →</button>
+  </div>
+ </div>
+</section>
+
+<!-- ─── BUILDER PARTNERS ─── -->
+<section id="partners" class="section">
+ <div class="container">
+  <div class="section-header fade-up">
+   <span class="section-label">Founding Builder Partners</span>
+   <h2 class="section-title">Trusted delivery partners. Not advertisers.</h2>
+   <p class="section-desc">Our builder partners are selected based on design compatibility, quality benchmarks and build certainty. They are recommended to you based on your chosen estate and lot.</p>
+  </div>
+  <div id="partnersGrid" class="fade-up" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px"></div>
+ </div>
+</section>
+
+<!-- ─── DEVELOPER ACCESS ─── -->
+<section id="developer-access" style="background:#07080D;padding:80px 0;border-top:1px solid var(--border)">
+ <div class="container">
+  <div class="grid-2">
+   <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border-light);border-radius:var(--radius-xl);padding:36px">
+    <div class="label label-accent" style="margin-bottom:14px">Existing Developer</div>
+    <h3 class="heading" style="color:#fff;margin-bottom:12px">Access Your Developer Portal</h3>
+    <p class="body-sm" style="margin-bottom:24px">Real-time sales pipeline, lot availability, contract status and buyer intelligence for your project.</p>
+    <ul style="list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:28px">
+     <li style="font-size:13px;color:var(--text-muted);display:flex;align-items:center;gap:9px"><span style="color:var(--success)">✓</span> Live lot availability & status</li>
+     <li style="font-size:13px;color:var(--text-muted);display:flex;align-items:center;gap:9px"><span style="color:var(--success)">✓</span> Contract & settlement pipeline</li>
+     <li style="font-size:13px;color:var(--text-muted);display:flex;align-items:center;gap:9px"><span style="color:var(--success)">✓</span> EOI tracking & buyer profiles</li>
+     <li style="font-size:13px;color:var(--text-muted);display:flex;align-items:center;gap:9px"><span style="color:var(--success)">✓</span> Marketing performance data</li>
+    </ul>
+    <a href="mailto:info@projxaustralia.com.au?subject=Developer Portal Access" class="btn btn-secondary">→ Login to Developer Portal</a>
+   </div>
+   <div style="background:rgba(245,158,11,0.04);border:1px solid rgba(245,158,11,0.2);border-radius:var(--radius-xl);padding:36px">
+    <div class="label label-gold" style="margin-bottom:14px">New Developer Enquiry</div>
+    <h3 class="heading" style="color:#fff;margin-bottom:12px">Not a ProjX developer yet?</h3>
+    <p class="body-sm" style="margin-bottom:24px">ProjX is one of SEQ's largest project marketing firms. Register your interest and a director will be in touch.</p>
+    <form id="devForm" onsubmit="submitDevForm(event)">
+     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <input type="text" id="devName2" placeholder="Full name *" required class="chat-input" style="padding:10px 12px;font-size:13px">
+      <input type="text" id="devCompany2" placeholder="Company *" required class="chat-input" style="padding:10px 12px;font-size:13px">
+     </div>
+     <input type="email" id="devEmail2" placeholder="Email *" required class="chat-input" style="width:100%;padding:10px 12px;font-size:13px;margin-bottom:10px">
+     <input type="tel" id="devPhone2" placeholder="Phone *" required class="chat-input" style="width:100%;padding:10px 12px;font-size:13px;margin-bottom:10px">
+     <input type="text" id="devSite2" placeholder="Site / suburb" class="chat-input" style="width:100%;padding:10px 12px;font-size:13px;margin-bottom:10px">
+     <button type="submit" class="btn btn-gold" style="width:100%">Register Developer Interest →</button>
+    </form>
+    <div id="devSuccess2" style="display:none;text-align:center;padding:20px 0"><span style="font-size:28px">✅</span><div style="font-weight:700;color:#fff;margin-top:10px">Registered. A director will be in touch within 24 hours.</div></div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+ <div class="footer-inner">
+  <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:24px;margin-bottom:32px">
+   <div>
+    <div class="footer-brand">New Homes Australia</div>
+    <div class="footer-tagline">Powered by ProjX Australia · Australia's New Homes Platform</div>
+   </div>
+   <div class="footer-links">
+    <a href="#estates">Estates</a>
+    <a href="#how-it-works">How It Works</a>
+    <a href="#consultants">Consultants</a>
+    <a href="#developer-access">Developers</a>
+    <a href="mailto:info@projxaustralia.com.au">Contact</a>
+   </div>
+  </div>
+  <div class="footer-bottom">
+   <div class="footer-disclaimer">Prices are indicative only. Images are for illustration purposes. New Homes Australia is operated by ProjX Group Australia Pty Ltd. All enquiries are managed by New Homes Australia Property Consultants. © 2026 ProjX Group Australia.</div>
+   <div style="white-space:nowrap">info@projxaustralia.com.au</div>
+  </div>
+ </div>
+</footer>
+
+<!-- ─── BUYER PROFILE ENGINE ─── -->
+<div id="profileModal">
+ <div class="profile-panel">
+  <div class="profile-progress" id="profileProgress"></div>
+  <div id="profileContent"></div>
+ </div>
+</div>
+
+<!-- ─── PACKAGE BUILDER PANEL ─── -->
+<button class="pkg-toggle" id="pkgToggle" onclick="togglePackagePanel()" title="Package Builder" style="display:none">📦</button>
+<div id="packagePanel">
+ <div class="pkg-inner">
+  <div class="pkg-item"><div class="pkg-label">Land</div><div class="pkg-value" id="pkgLand">—</div></div>
+  <div class="pkg-divider"></div>
+  <div class="pkg-item"><div class="pkg-label">Build</div><div class="pkg-value" id="pkgBuild">—</div></div>
+  <div class="pkg-divider"></div>
+  <div class="pkg-item"><div class="pkg-label">Site Costs</div><div class="pkg-value">$8,500</div></div>
+  <div class="pkg-divider"></div>
+  <div class="pkg-item"><div class="pkg-label">Driveway</div><div class="pkg-value">$4,200</div></div>
+  <div class="pkg-divider"></div>
+  <div class="pkg-item"><div class="pkg-label">Landscaping</div><div class="pkg-value">$6,000</div></div>
+  <div class="pkg-divider"></div>
+  <div class="pkg-item"><div class="pkg-label">Fencing</div><div class="pkg-value">$3,800</div></div>
+  <div class="pkg-divider"></div>
+  <div class="pkg-item" style="background:rgba(37,99,235,0.1);border-radius:8px;padding:6px 12px;min-width:120px"><div class="pkg-label" style="color:var(--accent-light)">Total Package</div><div class="pkg-value" id="pkgTotal" style="font-size:18px;color:#fff">—</div></div>
+  <div class="pkg-divider"></div>
+  <div class="pkg-item"><div class="pkg-label">Weekly Est.</div><div class="pkg-value" id="pkgWeekly" style="color:var(--success)">—</div></div>
+  <div class="pkg-cta"><button class="btn btn-primary btn-sm" onclick="openProfile()">Speak With Consultant →</button></div>
+ </div>
+</div>
+
+<!-- ─── CHAT WIDGET ─── -->
+<div id="chatWidget">
+ <button id="chatToggle" onclick="toggleChat()" aria-label="Chat">💬<span class="chat-badge-dot">1</span></button>
+ <div id="chatPanel">
+  <div class="chat-head">
+   <div class="chat-head-title">New Homes Australia</div>
+   <div class="chat-head-sub"><span class="chat-dot"></span>Property Consultants · Online now</div>
+  </div>
+  <div class="chat-messages"><div class="chat-bubble">G'day 👋 I'm here to help you find the right home opportunity. Drop your details and a consultant will reach out within the hour.</div></div>
+  <div class="chat-form" id="chatFormInner">
+   <input type="text" class="chat-input" id="chatName2" placeholder="Your name">
+   <input type="tel" class="chat-input" id="chatPhone2" placeholder="Phone number">
+   <input type="text" class="chat-input" id="chatMsg2" placeholder="What are you looking for?">
+   <button class="chat-submit" onclick="submitChat2()">Send Message →</button>
+  </div>
+ </div>
+</div>
+
+<script>
+// ─── DATA LOADING ────────────────────────────────────────────────────────────
+let PROJECTS = [], BUILDERS = [], DESIGNS = [], BUILDER_LOGOS = {}, BUILDER_LGAS = {};
+let CHEAPEST_BUILD = 245000;
+let buyerProfile = {};
+
+fetch('./data.json').then(r=>r.json()).then(d=>{
+  PROJECTS = d.PROJECTS||[];
+  BUILDERS = d.BUILDERS||[];
+  DESIGNS = d.DESIGNS||[];
+  BUILDER_LOGOS = d.BUILDER_LOGOS||{};
+  BUILDER_LGAS = d.BUILDER_LGAS||{};
+  CHEAPEST_BUILD = DESIGNS.length ? Math.min(...DESIGNS.map(d=>{const n=parseInt((d.price||'0').replace(/[^0-9]/g,''));return isNaN(n)?999999:n;})):245000;
+  init();
+}).catch(err=>{ console.error('Data load failed',err); init(); });
+
+function fmt(n){return '$'+Math.round(n).toLocaleString();}
+function fmtK(n){return '$'+Math.round(n/1000)+'k';}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+function init(){
+  renderSteps();
+  renderEstates(PROJECTS);
+  renderIntelligence();
+  renderConsultants();
+  renderPartners();
+  populateRegionFilter();
+  initObserver();
+  // Show package builder toggle after scroll
+  window.addEventListener('scroll', function(){
+    var toggle = document.getElementById('pkgToggle');
+    if(toggle) toggle.style.display = window.scrollY > 400 ? 'flex' : 'none';
+  });
+}
+
+// ─── HOW IT WORKS ────────────────────────────────────────────────────────────
+var STEPS = [
+  {icon:'🎯', title:'Build Your Profile', desc:'Tell us your buyer type, budget, location and timeframe. Takes 90 seconds.'},
+  {icon:'🗺️', title:'Discover Opportunities', desc:'Explore estates matched to your profile. View lots, packages and lifestyle data.'},
+  {icon:'⚡', title:'Match & Compare', desc:'Our matching engine scores every lot and design against your profile. Pick your best options.'},
+  {icon:'🤝', title:'Connect & Purchase', desc:'A dedicated consultant with your full profile calls you. From review to contract — guided.'}
+];
+function renderSteps(){
+  var g=document.getElementById('stepsGrid');
+  if(!g)return;
+  g.innerHTML=STEPS.map(function(s,i){
+    return '<div class="step-card"><div class="step-num">'+(i+1)+'</div><div class="step-icon">'+s.icon+'</div><div class="step-title">'+s.title+'</div><div class="step-desc">'+s.desc+'</div></div>';
+  }).join('');
+}
+
+// ─── BUYER PROFILE ENGINE ────────────────────────────────────────────────────
+var profileStep = 0;
+var PROFILE_STEPS = [
+  {
+    q:'What best describes you?', sub:'This helps us match the right opportunities.',
+    key:'type', cols:2,
+    options:[
+      {icon:'🏠', label:'First Home Buyer', desc:'Building your first property', val:'fhb'},
+      {icon:'📈', label:'Investor', desc:'Growing your portfolio', val:'investor'},
+      {icon:'⬆️', label:'Upgrader', desc:'Moving to a larger home', val:'upgrader'},
+      {icon:'⬇️', label:'Downsizer', desc:'Simplifying your lifestyle', val:'downsizer'}
+    ]
+  },
+  {
+    q:'What is your total budget?', sub:'Land and build combined. We\'ll show packages within your range.',
+    key:'budget', cols:2,
+    options:[
+      {icon:'💰', label:'Under $500,000', desc:'Entry level packages', val:'500'},
+      {icon:'💰', label:'$500k – $700k', desc:'Mid-range packages', val:'700'},
+      {icon:'💰', label:'$700k – $900k', desc:'Premium packages', val:'900'},
+      {icon:'💰', label:'$900k+', desc:'Luxury packages', val:'900plus'}
+    ]
+  },
+  {
+    q:'Where would you like to live?', sub:'Select your preferred region in South East Queensland.',
+    key:'region', cols:2,
+    options:[
+      {icon:'🌆', label:'Moreton Bay', desc:'North Brisbane corridor', val:'Moreton Bay'},
+      {icon:'🌿', label:'Ipswich', desc:'Western growth corridor', val:'Ipswich'},
+      {icon:'🌅', label:'Logan', desc:'Southern corridor', val:'Logan'},
+      {icon:'☀️', label:'Sunshine Coast', desc:'North coastal', val:'Sunshine Coast'},
+      {icon:'🏖️', label:'Gold Coast', desc:'South coastal', val:'Gold Coast'},
+      {icon:'🌾', label:'Other SEQ', desc:'Lockyer, Scenic Rim, etc', val:'other'}
+    ]
+  },
+  {
+    q:'What is your timeframe?', sub:'When do you need to be in your new home?',
+    key:'timeframe', cols:2,
+    options:[
+      {icon:'⚡', label:'ASAP', desc:'Ready to move quickly', val:'asap'},
+      {icon:'📅', label:'3–6 months', desc:'Short term planning', val:'3-6'},
+      {icon:'🗓️', label:'6–12 months', desc:'Mid-term planning', val:'6-12'},
+      {icon:'🔮', label:'12+ months', desc:'Long-term planning', val:'12plus'}
+    ]
+  }
+];
+
+function openProfile(){
+  profileStep=0;
+  document.getElementById('profileModal').style.display='flex';
+  renderProfileStep();
+}
+function closeProfile(){document.getElementById('profileModal').style.display='none';}
+
+document.getElementById('profileModal').addEventListener('click',function(e){
+  if(e.target===this)closeProfile();
+});
+
+function renderProfileStep(){
+  var total=PROFILE_STEPS.length;
+  var prog=document.getElementById('profileProgress');
+  if(prog){
+    prog.innerHTML=PROFILE_STEPS.map(function(_,i){
+      return '<div class="profile-dot '+(i<profileStep?'done':i===profileStep?'active':'')+'"></div>';
+    }).join('');
+  }
+  if(profileStep>=total){
+    // Show success
+    document.getElementById('profileContent').innerHTML='<div style="text-align:center;padding:20px 0"><div style="font-size:48px;margin-bottom:16px">🎯</div><div style="font-size:22px;font-weight:800;color:#fff;margin-bottom:8px">Your profile is set.</div><div style="font-size:14px;color:var(--text-muted);margin-bottom:28px">We\'re matching you with the best opportunities based on your preferences.</div><button class="btn btn-primary" style="width:100%;font-size:16px;padding:16px" onclick="closeProfile();document.getElementById(\'estates\').scrollIntoView({behavior:\'smooth\'})">View My Matched Estates →</button><div style="margin-top:12px"><button class="btn btn-secondary btn-sm" onclick="closeProfile()">Browse All Estates</button></div></div>';
+    return;
+  }
+  var step=PROFILE_STEPS[profileStep];
+  var opts=step.options.map(function(o){
+    var sel=buyerProfile[step.key]===o.val;
+    return '<div class="profile-option'+(sel?' selected':'')+'" onclick="selectProfile(\''+step.key+'\',\''+o.val+'\')">'+'<div class="profile-option-icon">'+o.icon+'</div><div class="profile-option-label">'+o.label+'</div><div class="profile-option-desc">'+o.desc+'</div></div>';
+  }).join('');
+  document.getElementById('profileContent').innerHTML='<div class="profile-question">'+step.q+'</div><div class="profile-sub">'+step.sub+'</div><div class="profile-options" style="grid-template-columns:repeat('+step.cols+',1fr)">'+opts+'</div><div class="profile-nav"><span class="profile-skip" onclick="profileStep++;renderProfileStep()">Skip this step</span>'+(profileStep>0?'<button class="btn btn-secondary btn-sm" onclick="profileStep--;renderProfileStep()">← Back</button>':'<span></span>')+'</div>';
+}
+
+function selectProfile(key, val){
+  buyerProfile[key]=val;
+  profileStep++;
+  renderProfileStep();
+}
+
+// ─── ESTATES RENDERING ────────────────────────────────────────────────────────
+function getMatchScore(p){
+  // Simulated match score based on profile
+  var base = 65;
+  if(buyerProfile.region && (p.region===buyerProfile.region||p.suburb===buyerProfile.region)) base+=20;
+  if(p.monthsToTitle===0) base+=5;
+  if(p.urgency==='hot'||p.urgency==='new') base+=5;
+  return Math.min(98, base + Math.floor(Math.random()*8));
+}
+
+function getScoreLabel(score){
+  if(score>=95) return {label:'Exceptional Match',cls:'score-high'};
+  if(score>=85) return {label:'Strong Match',cls:'score-high'};
+  if(score>=70) return {label:'Good Match',cls:'score-med'};
+  return {label:'Match',cls:'score-med'};
+}
+
+function getTimingBadge(months){
+  if(months===0) return '<span class="badge badge-green">🟢 Title Ready</span>';
+  if(months<=3) return '<span class="badge badge-blue">🔵 '+months+'mo</span>';
+  if(months<=6) return '<span class="badge" style="background:rgba(245,158,11,0.15);color:#FCD34D;border:1px solid rgba(245,158,11,0.25)">🟡 '+months+'mo</span>';
+  return '<span class="badge badge-dim">⚪ '+months+'mo</span>';
+}
+
+function renderEstates(projects){
+  var g=document.getElementById('estatesGrid');
+  var cnt=document.getElementById('estateCount');
+  if(!g)return;
+  if(projects.length===0){
+    g.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">🔍</div><div style="font-weight:700;color:#fff;margin-bottom:6px">No estates match your filters</div><div class="body-sm">Try adjusting your search.</div></div>';
+    if(cnt)cnt.textContent='0 estates';
+    return;
+  }
+  if(cnt)cnt.textContent=projects.length+' estate'+(projects.length!==1?'s':'');
+  g.innerHTML=projects.map(function(p){
+    var score=getMatchScore(p);
+    var sl=getScoreLabel(score);
+    var status=p.minPrice>0?'available':'coming-soon';
+    var statusLabel=status==='available'?'Available Now':'Coming Soon';
+    var statusColor=status==='available'?'var(--success)':'#F59E0B';
+    var pkg=p.minPrice>0?fmt(p.minPrice+CHEAPEST_BUILD):'From TBA';
+    var urgBadge='';
+    if(p.urgency==='hot') urgBadge='<span class="badge badge-red">🔥 '+escapeHtml(p.urgencyLabel||'')+'</span>';
+    else if(p.urgency==='new') urgBadge='<span class="badge badge-green">✨ '+escapeHtml(p.urgencyLabel||'')+'</span>';
+    else if(p.urgency==='active') urgBadge='<span class="badge badge-blue">📈 '+escapeHtml(p.urgencyLabel||'')+'</span>';
+    var imgSrc='img/'+p.id+'.jpg';
+    return '<div class="estate-card" onclick="openEstateDetail(\''+p.id+'\')">'
+      +'<div class="estate-card-img">'
+      +'<img src="'+imgSrc+'" alt="'+p.name+'" loading="lazy" onerror="this.src=\'img/oakland.jpg\'">'
+      +'<div class="estate-card-overlay"></div>'
+      +'<div class="estate-card-badges">'+urgBadge+getTimingBadge(p.monthsToTitle||12)+'</div>'
+      +'<div style="position:absolute;bottom:12px;right:12px"><span class="score-pill '+sl.cls+'">'+score+'% — '+sl.label+'</span></div>'
+      +'</div>'
+      +'<div class="estate-card-body">'
+      +'<div class="estate-card-region">'+p.region+'</div>'
+      +'<div class="estate-card-name">'+p.name+'</div>'
+      +'<div class="estate-card-suburb">'+p.suburb+', '+p.region+'</div>'
+      +'<div class="estate-card-price">'+pkg+'</div>'
+      +'<div class="estate-card-price-label">Total H&L package from'+(p.minPrice>0?' · Land from '+fmtK(p.minPrice):'')+' · '+CHEAPEST_BUILD/1000+'k+ build</div>'
+      +'<hr class="estate-card-divider">'
+      +'<div class="estate-card-meta">'
+      +'<span>'+p.availLots+' lots available</span>'
+      +'<span style="color:'+statusColor+';font-weight:600">'+statusLabel+'</span>'
+      +'</div>'
+      +'<div class="estate-card-scores">'
+      +(p.stageLabel?'<span class="badge badge-dim">'+p.stageLabel+'</span>':'')
+      +(p.absorption>50?'<span class="badge badge-gold">'+p.absorption+'% Sold</span>':'')
+      +'<span class="badge badge-blue">🚀 Fast Mover eligible</span>'
+      +'</div>'
+      +'</div></div>';
+  }).join('');
+}
+
+function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function openEstateDetail(id){
+  // For now, scroll to estates and highlight — full detail pages in Phase 2
+  document.getElementById('estates').scrollIntoView({behavior:'smooth'});
+  setTimeout(function(){openProfile();},600);
+}
+
+// ─── FILTERS ─────────────────────────────────────────────────────────────────
+function populateRegionFilter(){
+  var sel=document.getElementById('regionFilter');
+  if(!sel)return;
+  var regions=[...new Set(PROJECTS.map(function(p){return p.region;}))].sort();
+  regions.forEach(function(r){
+    var o=document.createElement('option');
+    o.value=r;o.textContent=r;
+    sel.appendChild(o);
+  });
+}
+
+function filterEstates(){
+  var q=(document.getElementById('estateSearch')||{}).value||'';
+  var region=(document.getElementById('regionFilter')||{}).value||'';
+  var timing=(document.getElementById('timingFilter')||{}).value||'';
+  var budget=(document.getElementById('budgetFilter')||{}).value||'';
+  var filtered=PROJECTS.filter(function(p){
+    if(q){var ql=q.toLowerCase();if(!(p.name||'').toLowerCase().includes(ql)&&!(p.suburb||'').toLowerCase().includes(ql)&&!(p.region||'').toLowerCase().includes(ql))return false;}
+    if(region&&p.region!==region)return false;
+    if(timing){var m=p.monthsToTitle!==undefined?p.monthsToTitle:12;if(m>parseInt(timing))return false;}
+    if(budget&&budget!=='901'){var max=parseInt(budget)*1000;var pkg=(p.minPrice||0)+CHEAPEST_BUILD;if(p.minPrice>0&&pkg>max)return false;}
+    if(budget==='901'){var pkg2=(p.minPrice||0)+CHEAPEST_BUILD;if(p.minPrice>0&&pkg2<900000)return false;}
+    return true;
+  });
+  renderEstates(filtered);
+}
+
+// ─── PROPERTY INTELLIGENCE ───────────────────────────────────────────────────
+var INTEL_ITEMS = [
+  {label:'Total Package', value:'$689,500', trend:'+2.3% this quarter', positive:true},
+  {label:'Weekly Repayment', value:'$836', trend:'At 6.1% · 30yr', positive:true},
+  {label:'Rental Appraisal', value:'$520/wk', trend:'Gross yield ~3.9%', positive:true},
+  {label:'Build Timeframe', value:'28 weeks', trend:'From slab to keys', positive:null},
+];
+var PKG_BREAKDOWN = [
+  {label:'Land Price', value:'$425,000', color:'#fff'},
+  {label:'Build Contract', value:'$245,000', color:'#fff'},
+  {label:'Site Cost Allowance', value:'$8,500', color:var_text_muted()},
+  {label:'Driveway', value:'$4,200', color:var_text_muted()},
+  {label:'Landscaping Allowance', value:'$6,000', color:var_text_muted()},
+  {label:'Fencing Allowance', value:'$3,800', color:var_text_muted()},
+];
+function var_text_muted(){return '#94A3B8';}
+function renderIntelligence(){
+  var g=document.getElementById('intelGrid');
+  if(g) g.innerHTML=INTEL_ITEMS.map(function(item){
+    return '<div class="intel-card"><div class="intel-value">'+item.value+'</div><div class="intel-label">'+item.label+'</div>'+(item.trend?'<div class="intel-trend '+(item.positive?'intel-positive':'')+'">'+item.trend+'</div>':'')+'</div>';
+  }).join('');
+  var pb=document.getElementById('pkgBreakdown');
+  if(pb) pb.innerHTML=PKG_BREAKDOWN.map(function(item,i){
+    var isTotal=i===PKG_BREAKDOWN.length-1;
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:'+(isTotal?'10px 0 0':'8px 0')+';'+(isTotal?'border-top:1px solid var(--border);':'border-bottom:1px solid var(--border)')+'"><span style="font-size:13px;color:'+item.color+'">'+item.label+'</span><span style="font-size:'+(isTotal?'16':'14')+'px;font-weight:'+(isTotal?'800':'600')+';color:'+item.color+'">'+item.value+'</span></div>';
+  }).join('');
+  var fs=document.getElementById('featuredScores');
+  if(fs) fs.innerHTML=[
+    {pct:98,label:'Family Match',cls:'score-high'},
+    {pct:94,label:'Investment',cls:'score-high'},
+    {pct:91,label:'Buildability',cls:'score-med'}
+  ].map(function(s){return '<span class="score-pill '+s.cls+'">'+s.pct+'% '+s.label+'</span>';}).join('');
+}
+
+// ─── CONSULTANTS ─────────────────────────────────────────────────────────────
+var CONSULTANTS = [
+  {initials:'MJ', name:'Michael J.', role:'Senior Property Consultant', note:'Specialises in Moreton Bay & Logan', actions:['Book a Strategy Session →','Review My Package']},
+  {initials:'SC', name:'Sarah C.', role:'Property Consultant', note:'First Home Buyer specialist', actions:['Speak With a Consultant →','Discuss My Options']},
+  {initials:'DT', name:'Daniel T.', role:'Investment Specialist', note:'SEQ investor portfolio focus', actions:['Book a Strategy Session →','Get Investor Brief']}
+];
+function renderConsultants(){
+  var g=document.getElementById('consultantsGrid');
+  if(!g)return;
+  g.innerHTML=CONSULTANTS.map(function(c){
+    return '<div class="consultant-card"><div class="consultant-avatar">'+c.initials+'</div><div style="flex:1"><div class="consultant-name">'+c.name+'</div><div class="consultant-role">'+c.role+'</div><div style="font-size:11px;color:var(--text-dim);margin-bottom:10px">'+c.note+'</div><button class="btn btn-primary btn-sm" onclick="openProfile()">'+c.actions[0]+'</button></div></div>';
+  }).join('');
+}
+
+// ─── BUILDER PARTNERS ────────────────────────────────────────────────────────
+function renderPartners(){
+  var g=document.getElementById('partnersGrid');
+  if(!g||!BUILDERS)return;
+  var premium=BUILDERS.filter(function(b){return b.tierGroup==='premium';});
+  var standard=BUILDERS.filter(function(b){return b.tierGroup==='standard';});
+  g.innerHTML=premium.map(function(b){
+    var logo=BUILDER_LOGOS[b.id]||'';
+    return '<div class="partner-card"><div class="partner-logo-wrap"><img src="'+logo+'" alt="'+b.name+'" onerror="this.style.display=\'none\'"></div><div style="flex:1"><div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:2px">'+b.name+'</div><div style="font-size:11px;color:var(--text-dim)">Founding Partner · '+b.tier+'</div></div><span class="badge badge-gold" style="flex-shrink:0">⭐ Preferred</span></div>';
+  }).join('')+standard.map(function(b){
+    var initials=b.name.split(' ').slice(0,2).map(function(w){return w[0];}).join('');
+    return '<div class="partner-card"><div style="width:40px;height:40px;border-radius:8px;background:'+b.color+';display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0">'+initials+'</div><div style="flex:1"><div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:2px">'+b.name+'</div><div style="font-size:11px;color:var(--text-dim)">Network Partner · '+b.tier+'</div></div></div>';
+  }).join('');
+}
+
+// ─── PACKAGE PANEL ───────────────────────────────────────────────────────────
+var pkgVisible=false;
+function togglePackagePanel(){
+  pkgVisible=!pkgVisible;
+  document.getElementById('packagePanel').classList.toggle('visible',pkgVisible);
+  document.getElementById('pkgToggle').style.bottom=pkgVisible?'80px':'20px';
+}
+// Update package panel with sample values
+function updatePackagePanel(land, build){
+  var extras=8500+4200+6000+3800;
+  var total=land+build+extras;
+  var weekly=Math.round((total*0.95*0.063/52)*10)/10;
+  document.getElementById('pkgLand').textContent=fmtK(land);
+  document.getElementById('pkgBuild').textContent=fmtK(build);
+  document.getElementById('pkgTotal').textContent=fmt(total);
+  document.getElementById('pkgWeekly').textContent='$'+Math.round(weekly)+'/wk';
+}
+updatePackagePanel(425000,245000);
+
+// ─── CHAT ────────────────────────────────────────────────────────────────────
+function toggleChat(){
+  var p=document.getElementById('chatPanel');
+  var b=document.getElementById('chatToggle').querySelector('.chat-badge-dot');
+  p.style.display=p.style.display==='none'?'block':'none';
+  if(b)b.style.display='none';
+}
+function submitChat2(){
+  var name=document.getElementById('chatName2').value.trim();
+  var phone=document.getElementById('chatPhone2').value.trim();
+  var msg=document.getElementById('chatMsg2').value.trim();
+  if(!name||!phone)return;
+  document.getElementById('chatFormInner').innerHTML='<div style="text-align:center;padding:12px 0;color:var(--text-muted);font-size:13px">✅ Thanks '+name.split(' ')[0]+'! We\'ll call you back within the hour.</div>';
+  fetch('https://formsubmit.co/ajax/louka@projxaustralia.com.au',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({_subject:'NHA Chat Lead: '+name,Name:name,Phone:phone,Message:msg||'-',Source:'NHA Chat Widget'})}).catch(function(){});
+}
+
+// ─── DEV FORM ────────────────────────────────────────────────────────────────
+function submitDevForm(e){
+  e.preventDefault();
+  var name=document.getElementById('devName2').value.trim();
+  var co=document.getElementById('devCompany2').value.trim();
+  var email=document.getElementById('devEmail2').value.trim();
+  var phone=document.getElementById('devPhone2').value.trim();
+  var site=document.getElementById('devSite2').value.trim();
+  document.getElementById('devForm').style.display='none';
+  document.getElementById('devSuccess2').style.display='block';
+  fetch('https://formsubmit.co/ajax/louka@projxaustralia.com.au',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({_subject:'\uD83C\uDFD7\uFE0F NHA Developer Enquiry: '+co+' ('+name+')',Name:name,Company:co,Email:email,Phone:phone,Site:site||'-',Source:'NHA Developer Enquiry'})}).catch(function(){});
+}
+
+// ─── NAV ─────────────────────────────────────────────────────────────────────
+function toggleNav(){
+  var links=document.getElementById('navLinks')||document.querySelector('.nav-links');
+  if(links) links.style.display=links.style.display==='flex'?'none':'flex';
+}
+
+// ─── OBSERVER ────────────────────────────────────────────────────────────────
+function initObserver(){
+  var obs=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}
+    });
+  },{threshold:0.05,rootMargin:'0px 0px 60px 0px'});
+  document.querySelectorAll('.fade-up').forEach(function(el){obs.observe(el);});
+  requestAnimationFrame(function(){
+    document.querySelectorAll('.fade-up').forEach(function(el){
+      var r=el.getBoundingClientRect();
+      if(r.top<window.innerHeight&&r.bottom>0)el.classList.add('visible');
+    });
+  });
+}
+</script>
+</body>
+</html>
