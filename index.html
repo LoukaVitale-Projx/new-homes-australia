@@ -264,7 +264,88 @@ footer{background:var(--primary);padding:56px 0 32px;color:rgba(255,255,255,0.6)
 .footer-bottom{border-top:1px solid rgba(255,255,255,0.08);padding-top:24px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:12px;color:rgba(255,255,255,0.3)}
 
 /* ─ RESPONSIVE ─ */
-@media(max-width:1024px){.grid-4{grid-template-columns:repeat(2,1fr)}.grid-3{grid-template-columns:repeat(2,1fr)}}
+
+ /* ─ ESTATE DETAIL PANEL ─ */
+ #estatePanel{position:fixed;inset:0;z-index:2000;display:none;flex-direction:column;background:var(--white)}
+ #estatePanel.open{display:flex}
+ .ep-header{height:64px;background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 32px;gap:16px;flex-shrink:0}
+ .ep-back{background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-2);display:flex;align-items:center;gap:6px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;padding:8px 12px;border-radius:8px;transition:var(--transition)}
+ .ep-back:hover{background:var(--bg);color:var(--primary)}
+ .ep-title{font-size:16px;font-weight:800;color:var(--primary);letter-spacing:-0.3px}
+ .ep-body{display:grid;grid-template-columns:1fr 420px;overflow:hidden;flex:1}
+ .ep-left{overflow-y:auto;padding:0}
+ .ep-right{overflow-y:auto;border-left:1px solid var(--border);padding:28px}
+ .ep-hero{width:100%;height:320px;object-fit:cover;display:block}
+ .ep-info{padding:28px 32px}
+ .ep-region{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-4);margin-bottom:8px}
+ .ep-name{font-size:32px;font-weight:900;color:var(--primary);letter-spacing:-1.5px;margin-bottom:6px}
+ .ep-loc{font-size:15px;color:var(--text-3);margin-bottom:20px}
+ .ep-stat-row{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:24px}
+ .ep-stat{background:var(--bg);border-radius:var(--radius);padding:14px 18px;flex:1;min-width:120px}
+ .ep-stat-val{font-size:22px;font-weight:900;color:var(--primary);letter-spacing:-0.5px}
+ .ep-stat-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-4);margin-top:2px}
+
+ /* Progressive reveal — intelligence layer */
+ .intel-reveal{opacity:0;transform:translateY(16px);transition:opacity 0.5s ease,transform 0.5s ease}
+ .intel-reveal.revealed{opacity:1;transform:translateY(0)}
+ .score-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+ .score-box{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:18px;text-align:center;transition:var(--transition)}
+ .score-box:hover{border-color:var(--accent);box-shadow:var(--shadow)}
+ .score-box-num{font-size:32px;font-weight:900;letter-spacing:-1px;margin-bottom:4px}
+ .score-box-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-4)}
+ .score-box-sublabel{font-size:11px;color:var(--text-3);margin-top:2px}
+ .score-high-col{color:var(--success)}
+ .score-med-col{color:var(--accent)}
+ .score-warm-col{color:var(--warm)}
+
+ /* Package builder interactive */
+ .pkg-section{background:var(--bg);border-radius:var(--radius-lg);padding:20px;margin-bottom:16px}
+ .pkg-section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-4);margin-bottom:14px}
+ .pkg-line{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border-soft);font-size:14px}
+ .pkg-line:last-child{border-bottom:none}
+ .pkg-line-label{color:var(--text-2);font-weight:500}
+ .pkg-line-val{font-weight:700;color:var(--primary)}
+ .pkg-total-big{font-size:36px;font-weight:900;color:var(--primary);letter-spacing:-1.5px;margin-bottom:2px}
+ .pkg-total-sub{font-size:13px;color:var(--text-3);margin-bottom:16px}
+
+ /* Investment metrics reveal */
+ .invest-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border-soft)}
+ .invest-row:last-child{border-bottom:none}
+ .invest-label{font-size:14px;color:var(--text-2)}
+ .invest-value{font-size:15px;font-weight:700;color:var(--primary)}
+ .invest-positive{color:var(--success)}
+
+ /* Lifestyle section */
+ .lifestyle-bar{margin-bottom:10px}
+ .lifestyle-bar-label{display:flex;justify-content:space-between;font-size:12px;color:var(--text-2);margin-bottom:4px}
+ .lifestyle-bar-track{height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+ .lifestyle-bar-fill{height:100%;border-radius:3px;background:var(--success);transition:width 1s ease}
+
+ /* Lot selection */
+ .lot-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:16px}
+ .lot-card{border:1.5px solid var(--border);border-radius:var(--radius);padding:14px;cursor:pointer;transition:var(--transition);text-align:center}
+ .lot-card:hover,.lot-card.selected{border-color:var(--accent);background:var(--accent-soft)}
+ .lot-card-size{font-size:16px;font-weight:800;color:var(--primary);letter-spacing:-0.3px}
+ .lot-card-price{font-size:12px;color:var(--text-3);margin-top:2px}
+
+ /* Consultant CTA in panel */
+ .panel-cta{background:var(--primary);border-radius:var(--radius-xl);padding:24px;text-align:center;margin-top:8px}
+ .panel-cta-title{font-size:18px;font-weight:800;color:#fff;margin-bottom:6px;letter-spacing:-0.3px}
+ .panel-cta-sub{font-size:13px;color:rgba(255,255,255,0.55);margin-bottom:18px;line-height:1.6}
+
+ @media(max-width:900px){
+   .ep-body{grid-template-columns:1fr}
+   .ep-right{border-left:none;border-top:1px solid var(--border)}
+   .score-grid{grid-template-columns:1fr 1fr}
+ }
+ @media(max-width:640px){
+   .ep-hero{height:220px}
+   .ep-info{padding:20px}
+   .score-grid{grid-template-columns:1fr 1fr}
+   .ep-right{padding:20px}
+ }
+
+ @media(max-width:1024px){.grid-4{grid-template-columns:repeat(2,1fr)}.grid-3{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:768px){.hero-inner,.grid-2{grid-template-columns:1fr;gap:32px}.hero-visual{display:none}.container{padding:0 20px}.section{padding:64px 0}.nav-links{display:none}.hamburger{display:flex}.trust-strip-inner{justify-content:flex-start}.grid-3{grid-template-columns:1fr}.search-bar-wrap{flex-direction:column}.fast-mover-strip{flex-direction:column}.consultant-strip{flex-direction:column}}
 @media(max-width:480px){.hero-btns{flex-direction:column}.hero-h1{font-size:34px}.grid-4{grid-template-columns:1fr}}
 </style>
@@ -846,6 +927,168 @@ function submitDevForm(e){
 }
 
 // ─── CHAT ────────────────────────────────────────────────────────────────────
+
+// ESTATE DETAIL PANEL — PROGRESSIVE DISCLOSURE
+var currentEstate = null;
+var pkgSelectedLot = null;
+var pkgSelectedDesign = null;
+var panelIntelRevealed = false;
+
+function openEstate(id) {
+  var p = PROJECTS.find(function(p) { return p.id === id; });
+  if (!p) return;
+  currentEstate = p;
+  pkgSelectedLot = null;
+  pkgSelectedDesign = null;
+  panelIntelRevealed = false;
+  document.getElementById('epTitle').textContent = p.name;
+  document.getElementById('epRegion').textContent = p.region;
+  document.getElementById('epName').textContent = p.name;
+  document.getElementById('epLoc').textContent = p.suburb + ', ' + p.region;
+  var heroEl = document.getElementById('epHero');
+  if(heroEl){heroEl.src='img/'+p.id+'.jpg';heroEl.onerror=function(){this.src='img/oakland.jpg';};}
+  var tags=[];
+  if(p.monthsToTitle===0)tags.push('<span class="etag etag-green">🟢 Title Ready</span>');
+  else if(p.monthsToTitle<=3)tags.push('<span class="etag etag-blue">🔵 '+p.monthsToTitle+'mo to title</span>');
+  else if(p.monthsToTitle<=6)tags.push('<span class="etag etag-orange">🟡 '+p.monthsToTitle+'mo to title</span>');
+  if(p.urgencyLabel)tags.push('<span class="etag etag-'+(p.urgency==="hot"?"red":p.urgency==="new"?"green":"blue")+'">'+(p.urgency==="hot"?"🔥":p.urgency==="new"?"✨":"📈")+' '+esc(p.urgencyLabel)+'</span>');
+  if(p.stageLabel)tags.push('<span class="etag etag-gray">'+esc(p.stageLabel)+'</span>');
+  var tagsEl=document.getElementById('epTags');
+  if(tagsEl)tagsEl.innerHTML=tags.join("");
+  var pkg=p.minPrice>0?fmt(p.minPrice+CHEAPEST_BUILD):"TBA";
+  var statsEl=document.getElementById("epStats");
+  if(statsEl)statsEl.innerHTML=[
+    {val:pkg,label:"From (H&L Package)"},
+    {val:p.availLots+" lots",label:"Available"},
+    {val:p.minPrice>0?fmtK(p.minPrice):"TBA",label:"Land From"},
+    {val:p.absorption>0?p.absorption+"% sold":"Pre-Release",label:"Absorption"}
+  ].map(function(s){return "<div class=\"ep-stat\"><div class=\"ep-stat-val\">"+s.val+"</div><div class=\"ep-stat-label\">"+s.label+"</div></div>";}).join("");
+  updatePanelSaveBtn(p.id);
+  var frontages=[10,12.5,14,16];
+  var lotPills=document.getElementById("pkgLotPills");
+  if(lotPills)lotPills.innerHTML=frontages.map(function(f){return "<button class=\"filter-pill-btn btn-sm\" data-frontage=\""+f+"\" onclick=\"selectPkgLot("+f+")\">"+f+"m</button>";}).join("");
+  var premiumDesigns=DESIGNS.filter(function(d){return BUILDERS.find(function(b){return b.name===d.builder&&b.tierGroup==="premium";});}).slice(0,8);
+  var designPills=document.getElementById("pkgDesignPills");
+  if(designPills)designPills.innerHTML=premiumDesigns.map(function(d){return "<button class=\"filter-pill-btn btn-sm\" data-design=\""+esc(d.name)+"\" style=\"font-size:11px\" onclick=\"selectPkgDesign('"+d.name.replace(/'/g,"\\'")+"\')\" >"+esc(d.name.replace("FRD ","").replace("Oxford Green ","")).substring(0,12)+"</button>";}).join("");
+  var panel=document.getElementById("estatePanel");
+  if(panel){panel.classList.add("open");document.body.style.overflow="hidden";}
+  updateLivePkg();
+  setTimeout(function(){revealIntelligence(p);},1800);
+}
+
+function closeEstatePanel(){
+  var panel=document.getElementById("estatePanel");
+  if(panel)panel.classList.remove("open");
+  document.body.style.overflow="";
+  currentEstate=null;
+}
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&document.getElementById("estatePanel")&&document.getElementById("estatePanel").classList.contains("open"))closeEstatePanel();});
+
+function revealIntelligence(p){
+  if(panelIntelRevealed)return;
+  panelIntelRevealed=true;
+  var scores=[
+    {val:94,label:"Lifestyle Score",sub:"Schools, amenities, commute",cls:"score-high-col"},
+    {val:p.absorption>50?91:78,label:"Demand Score",sub:"Enquiries & absorption rate",cls:"score-high-col"},
+    {val:p.minPrice>0&&p.minPrice<400000?88:74,label:"Affordability",sub:"Vs. regional median",cls:"score-med-col"},
+    {val:p.monthsToTitle===0?96:82,label:"Build Certainty",sub:"Title & builder availability",cls:"score-warm-col"}
+  ];
+  var scoresEl=document.getElementById("epScores");
+  if(scoresEl)scoresEl.innerHTML=scores.map(function(s){return "<div class=\"score-box\"><div class=\"score-box-num "+s.cls+"\">"+s.val+"</div><div class=\"score-box-label\">"+s.label+"</div><div class=\"score-box-sublabel\">"+s.sub+"</div></div>";}).join("");
+  var ir=document.getElementById("intelReveal");if(ir)ir.classList.add("revealed");
+  setTimeout(function(){
+    var bars=[
+      {label:"Schooling",score:82},{label:"Amenities",score:75},
+      {label:"Infrastructure",score:88},{label:"Growth Potential",score:p.absorption>40?91:74}
+    ];
+    var lbEl=document.getElementById("lifestyleBars");
+    if(lbEl)lbEl.innerHTML=bars.map(function(l){return "<div class=\"lifestyle-bar\"><div class=\"lifestyle-bar-label\"><span>"+l.label+"</span><span style=\"font-weight:700;color:var(--primary)\">"+l.score+"/100</span></div><div class=\"lifestyle-bar-track\"><div class=\"lifestyle-bar-fill\" style=\"width:0%\" data-width=\""+l.score+"%\"></div></div></div>";}).join("");
+    var sfEl=document.getElementById("suburbFacts");
+    if(sfEl)sfEl.innerHTML=[
+      {label:"Region",val:p.region},{label:"Suburb",val:p.suburb},
+      {label:"Land Timing",val:p.monthsToTitle===0?"Title Ready":p.monthsToTitle+" months"},
+      {label:"Lot Sizes",val:"300m² – 700m²"}
+    ].map(function(f){return "<div style=\"background:var(--bg);border-radius:var(--radius);padding:12px 14px\"><div style=\"font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-4);margin-bottom:4px\">"+f.label+"</div><div style=\"font-size:14px;font-weight:700;color:var(--primary)\">"+f.val+"</div></div>";}).join("");
+    var lr=document.getElementById("lifestyleReveal");if(lr)lr.classList.add("revealed");
+    requestAnimationFrame(function(){document.querySelectorAll(".lifestyle-bar-fill").forEach(function(el){el.style.width=el.getAttribute("data-width");});});
+  },400);
+}
+
+function selectPkgLot(frontage){
+  pkgSelectedLot=frontage;
+  document.querySelectorAll("#pkgLotPills .filter-pill-btn").forEach(function(btn){btn.classList.toggle("active",parseFloat(btn.getAttribute("data-frontage"))===frontage);});
+  updateLivePkg();
+  if(pkgSelectedDesign)revealInvestment();
+}
+function selectPkgDesign(name){
+  pkgSelectedDesign=DESIGNS.find(function(d){return d.name===name;});
+  document.querySelectorAll("#pkgDesignPills .filter-pill-btn").forEach(function(btn){btn.classList.toggle("active",btn.getAttribute("data-design")===name);});
+  updateLivePkg();
+  if(pkgSelectedLot)revealInvestment();
+}
+
+function updateLivePkg(){
+  var breakdown=document.getElementById("livePkgBreakdown");
+  var totalEl=document.getElementById("livePkgTotal");
+  var subEl=document.getElementById("livePkgSub");
+  if(!breakdown)return;
+  var land=currentEstate&&currentEstate.minPrice>0?currentEstate.minPrice:0;
+  var build=pkgSelectedDesign?parseInt((pkgSelectedDesign.price||"0").replace(/[^0-9]/g,"0")):0;
+  var site=8500,drive=4200,landscape=6000,fence=3800;
+  if(!pkgSelectedLot&&!pkgSelectedDesign){breakdown.innerHTML="<div style=\"text-align:center;padding:20px;color:var(--text-3);font-size:13px\">Select a lot width and home design to build your package</div>";if(totalEl)totalEl.textContent="—";if(subEl)subEl.textContent="Select a lot and design to see your package";return;}
+  var total=land+build+site+drive+landscape+fence;
+  var rows=[
+    {label:"Land Price"+(pkgSelectedLot?" ("+pkgSelectedLot+"m frontage)":""),val:land>0?fmt(land):"TBA"},
+    {label:"Build Contract"+(pkgSelectedDesign?" — "+pkgSelectedDesign.name:""),val:build>0?fmt(build):"Select a design"},
+    {label:"Site Cost Allowance",val:fmt(site)},
+    {label:"Driveway Allowance",val:fmt(drive)},
+    {label:"Landscaping Allowance",val:fmt(landscape)},
+    {label:"Fencing Allowance",val:fmt(fence)}
+  ];
+  breakdown.innerHTML="<div class=\"pkg-section-title\">Package Breakdown</div>"+rows.map(function(r){return "<div class=\"pkg-line\"><span class=\"pkg-line-label\">"+r.label+"</span><span class=\"pkg-line-val\">"+r.val+"</span></div>";}).join("");
+  if(total>fence+site+drive+landscape){
+    if(totalEl)totalEl.textContent=fmt(total);
+    var weekly=Math.round(total*0.95*0.063/52);
+    if(subEl)subEl.textContent="Est. $"+weekly+"/week at 6.1% · 30yr · 10% deposit";
+  }
+}
+
+function revealInvestment(){
+  var el=document.getElementById("investReveal");
+  if(el&&!el.classList.contains("revealed")){
+    el.classList.add("revealed");
+    var land=currentEstate&&currentEstate.minPrice>0?currentEstate.minPrice:425000;
+    var build=pkgSelectedDesign?parseInt((pkgSelectedDesign.price||"0").replace(/[^0-9]/g,"0")):264500;
+    var total=land+build+22500;
+    var weekly=Math.round(total*0.95*0.063/52);
+    var rent=Math.round(total*0.04/52);
+    var yield_=((rent*52/total)*100).toFixed(1);
+    var deposit=Math.round(total*0.1);
+    var irEl=document.getElementById("invRepay");if(irEl)irEl.textContent="$"+weekly+"/week";
+    var rentEl=document.getElementById("invRent");if(rentEl)rentEl.textContent="$"+rent+"/week (est.)";
+    var yieldEl=document.getElementById("invYield");if(yieldEl)yieldEl.textContent=yield_+"% gross yield";
+    var depEl=document.getElementById("invDeposit");if(depEl)depEl.textContent=fmt(deposit);
+  }
+}
+
+function updatePanelSaveBtn(id){
+  var btn=document.getElementById("epSaveBtn");
+  if(btn)btn.textContent=isSaved(id)?"❤️ Saved":"🤍 Save";
+}
+function toggleSaveFromPanel(){
+  if(!currentEstate)return;
+  var id=currentEstate.id;
+  var idx=savedEstates.indexOf(id);
+  if(idx>-1)savedEstates.splice(idx,1);else savedEstates.push(id);
+  localStorage.setItem("nha_saved",JSON.stringify(savedEstates));
+  updateSavedUI();updatePanelSaveBtn(id);
+}
+function openChatFromPanel(){
+  var chat=document.getElementById("chatPanel");
+  if(chat){chat.style.display="block";var q=document.getElementById("chatQuery");if(q&&currentEstate)q.value="Interested in "+currentEstate.name;}
+}
+
+
 function toggleChat(){
   var p=document.getElementById('chatPanel');
   var b=document.querySelector('#chatToggle .chat-badge');
@@ -883,5 +1126,105 @@ function initObserver(){
   });
 }
 </script>
+
+<!-- ─── ESTATE DETAIL PANEL (progressive disclosure) ─── -->
+<div id="estatePanel">
+ <div class="ep-header">
+  <button class="ep-back" onclick="closeEstatePanel()">← Back to Estates</button>
+  <div class="ep-title" id="epTitle"></div>
+  <div style="margin-left:auto;display:flex;gap:10px">
+   <button class="btn btn-outline btn-sm" id="epSaveBtn" onclick="toggleSaveFromPanel()">🤍 Save</button>
+   <button class="btn btn-primary btn-sm" onclick="openChatFromPanel()">Talk to a Consultant →</button>
+  </div>
+ </div>
+ <div class="ep-body">
+
+  <!-- LEFT: Discovery + Desire layer -->
+  <div class="ep-left">
+   <img id="epHero" src="" alt="" class="ep-hero">
+   <div class="ep-info">
+    <div class="ep-region" id="epRegion"></div>
+    <div class="ep-name" id="epName"></div>
+    <div class="ep-loc" id="epLoc"></div>
+    <!-- Tags -->
+    <div id="epTags" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px"></div>
+    <!-- Stats -->
+    <div class="ep-stat-row" id="epStats"></div>
+
+    <!-- ─ INTELLIGENCE REVEAL — appears with delay after opening ─ -->
+    <div class="intel-reveal" id="intelReveal" style="margin-top:8px">
+     <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-4);margin-bottom:16px">Your Opportunity Assessment</div>
+     <div class="score-grid" id="epScores"></div>
+    </div>
+
+    <!-- ─ LIFESTYLE DATA ─ -->
+    <div class="intel-reveal" id="lifestyleReveal" style="margin-top:8px">
+     <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-4);margin-bottom:16px">Lifestyle Intelligence</div>
+     <div id="lifestyleBars"></div>
+     <div id="suburbFacts" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px"></div>
+    </div>
+
+    <!-- ─ LOT SELECTION ─ -->
+    <div id="lotSection" style="margin-top:24px">
+     <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-4);margin-bottom:14px">Available Lot Sizes</div>
+     <div class="lot-grid" id="lotGrid"></div>
+    </div>
+
+    <!-- Fast Mover callout -->
+    <div style="background:linear-gradient(110deg,#FFF3EB,#FFF9F5);border:1.5px solid rgba(232,131,58,0.25);border-radius:var(--radius-lg);padding:18px 20px;margin-top:4px;display:flex;align-items:center;gap:14px">
+     <span style="font-size:24px;flex-shrink:0">🚀</span>
+     <div>
+      <div style="font-size:14px;font-weight:800;color:var(--primary);margin-bottom:3px">Fast Mover Offer applies to this estate</div>
+      <div style="font-size:12px;color:var(--text-3)">Sign within 30 days of enquiry — receive $10,000 in builder upgrades or $5,000 cashback on settlement.</div>
+     </div>
+    </div>
+   </div>
+  </div>
+
+  <!-- RIGHT: Package builder + intelligence sidebar -->
+  <div class="ep-right">
+   <!-- Package builder title -->
+   <div style="font-size:18px;font-weight:800;color:var(--primary);letter-spacing:-0.3px;margin-bottom:4px">Build Your Package</div>
+   <div style="font-size:13px;color:var(--text-3);margin-bottom:20px">See the complete cost breakdown before speaking to anyone.</div>
+
+   <!-- Lot/build selector -->
+   <div style="margin-bottom:18px">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-4);margin-bottom:10px">Select a lot width</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap" id="pkgLotPills"></div>
+   </div>
+   <div style="margin-bottom:20px">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-4);margin-bottom:10px">Select a home design</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap" id="pkgDesignPills"></div>
+   </div>
+
+   <!-- Live package breakdown -->
+   <div class="pkg-section" id="livePkgBreakdown"></div>
+   <div style="text-align:center;margin-bottom:20px">
+    <div class="pkg-total-big" id="livePkgTotal">—</div>
+    <div class="pkg-total-sub" id="livePkgSub">Select a lot and design to see your package</div>
+   </div>
+
+   <!-- ─ INVESTMENT REVEAL — appears after package interaction ─ -->
+   <div class="intel-reveal" id="investReveal">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-4);margin-bottom:14px">Investment Intelligence</div>
+    <div class="invest-row"><span class="invest-label">Weekly Repayment</span><span class="invest-value" id="invRepay">—</span></div>
+    <div class="invest-row"><span class="invest-label">Est. Rental Appraisal</span><span class="invest-value invest-positive" id="invRent">—</span></div>
+    <div class="invest-row"><span class="invest-label">Gross Yield</span><span class="invest-value invest-positive" id="invYield">—</span></div>
+    <div class="invest-row"><span class="invest-label">Deposit Required (10%)</span><span class="invest-value" id="invDeposit">—</span></div>
+    <div class="invest-row"><span class="invest-label">Build Timeframe</span><span class="invest-value">28 – 32 weeks</span></div>
+   </div>
+
+   <!-- Consultant CTA -->
+   <div class="panel-cta">
+    <div class="panel-cta-title">Ready to take the next step?</div>
+    <div class="panel-cta-sub">A consultant with this estate's details and your package ready will call you back within the hour.</div>
+    <button class="btn btn-warm" style="width:100%;margin-bottom:10px" onclick="openChatFromPanel()">Speak With a Consultant →</button>
+    <button class="btn" style="background:rgba(255,255,255,0.1);color:#fff;width:100%;font-size:13px" onclick="toggleSaveFromPanel()">♡ Save This Estate</button>
+   </div>
+  </div>
+
+ </div>
+</div>
+
 </body>
 </html>
